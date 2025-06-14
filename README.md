@@ -17,7 +17,7 @@ A modern, responsive web application for Sparkure, a premium cleaning service br
 ## ✨ Features
 
 - 🎨 Modern and responsive design
-- ⚡ Server-side rendering with Next.js 13
+- ⚡ Server-side rendering with Next.js 15
 - 🎭 Smooth animations and transitions
 - 📱 Mobile-first approach
 - 🎯 SEO optimized
@@ -26,7 +26,7 @@ A modern, responsive web application for Sparkure, a premium cleaning service br
 
 ## 🛠️ Tech Stack
 
-- **Framework:** Next.js 13
+- **Framework:** Next.js 15
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
 - **Animations:** Framer Motion

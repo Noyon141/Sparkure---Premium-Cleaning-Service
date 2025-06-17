@@ -6,12 +6,18 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  EMPLOYEE
+  ADMIN
 }
 
 model User {
@@ -22,6 +28,27 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  role Role @default(USER)
+
+  // Relations
+  contactSubmissions ContactSubmission[]
+
   @@map("users")
 }
 
+model ContactSubmission {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String
+  phone     String
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("contact_submissions")
+}

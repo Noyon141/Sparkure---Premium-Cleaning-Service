@@ -1,6 +1,11 @@
+"use client";
+
 import { AnimatedButton } from "@/components/ui/animated-button";
 import { AnimatedWrapper } from "@/components/ui/animated-wrapper";
+import { authService } from "@/lib/auth-service";
+import { useAuth } from "@/lib/hooks/use-auth";
 import Link from "next/link";
+import { toast } from "sonner";
 
 const items = [
   {
@@ -18,6 +23,20 @@ const items = [
 ];
 
 export function Header() {
+  const { user, isAuthenticated, logout, isLoading } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await authService.signOut();
+      logout();
+      toast.success("Signed out successfully");
+      // RouteGuard will handle the redirect to home page
+    } catch (error) {
+      console.error("Sign out error:", error);
+      toast.error("Failed to sign out");
+    }
+  };
+
   return (
     <header className="border-b border-primary/10">
       <div className="container mx-auto px-4 py-4">
@@ -43,23 +62,49 @@ export function Header() {
                 </Link>
               </AnimatedWrapper>
             ))}
-            <AnimatedWrapper animation="slide">
-              <Link href="/sign-in">
-                <AnimatedButton
-                  variant="outline"
-                  className="border-primary/20 hover:border-primary/40"
-                >
-                  Sign in
-                </AnimatedButton>
-              </Link>
-            </AnimatedWrapper>
-            <AnimatedWrapper animation="slide">
-              <Link href="/sign-up">
-                <AnimatedButton className="bg-primary hover:bg-primary/90">
-                  Sign up
-                </AnimatedButton>
-              </Link>
-            </AnimatedWrapper>
+
+            {!isLoading && (
+              <>
+                {isAuthenticated ? (
+                  <div className="flex items-center space-x-4">
+                    <AnimatedWrapper animation="slide">
+                      <span className="text-neutral">
+                        Welcome, {user?.fullName}
+                      </span>
+                    </AnimatedWrapper>
+                    <AnimatedWrapper animation="slide">
+                      <AnimatedButton
+                        variant="outline"
+                        onClick={handleSignOut}
+                        className="border-primary/20 hover:border-primary/40"
+                      >
+                        Sign out
+                      </AnimatedButton>
+                    </AnimatedWrapper>
+                  </div>
+                ) : (
+                  <>
+                    <AnimatedWrapper animation="slide">
+                      <Link href="/sign-in">
+                        <AnimatedButton
+                          variant="outline"
+                          className="border-primary/20 hover:border-primary/40"
+                        >
+                          Sign in
+                        </AnimatedButton>
+                      </Link>
+                    </AnimatedWrapper>
+                    <AnimatedWrapper animation="slide">
+                      <Link href="/sign-up">
+                        <AnimatedButton className="bg-primary hover:bg-primary/90">
+                          Sign up
+                        </AnimatedButton>
+                      </Link>
+                    </AnimatedWrapper>
+                  </>
+                )}
+              </>
+            )}
           </div>
 
           {/* Mobile menu button - you can implement mobile menu later */}

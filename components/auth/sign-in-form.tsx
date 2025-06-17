@@ -10,12 +10,19 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authService } from "@/lib/auth-service";
+import { useAuth } from "@/lib/hooks/use-auth";
 import { signInSchema, type SignInFormValues } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export function SignInForm() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { setUser } = useAuth();
+
   const form = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -26,10 +33,17 @@ export function SignInForm() {
 
   const onSubmit = async (data: SignInFormValues) => {
     try {
-      // TODO: Implement sign in logic
-      console.log(data);
+      setIsLoading(true);
+      const response = await authService.signIn(data);
+
+      setUser(response.user);
+      toast.success("Sign in successful!");
+      // RouteGuard will handle the redirect to dashboard
     } catch (error) {
-      console.error(error);
+      console.error("Sign in error:", error);
+      toast.error(error instanceof Error ? error.message : "Sign in failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -84,9 +98,9 @@ export function SignInForm() {
           <AnimatedButton
             type="submit"
             className="w-full h-12 text-base font-bold"
-            disabled={form.formState.isSubmitting}
+            disabled={isLoading}
           >
-            {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
+            {isLoading ? "Signing in..." : "Sign in"}
           </AnimatedButton>
         </form>
       </Form>

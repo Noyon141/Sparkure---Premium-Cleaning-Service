@@ -10,12 +10,19 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authService } from "@/lib/auth-service";
+import { useAuth } from "@/lib/hooks/use-auth";
 import { signUpSchema, type SignUpFormValues } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export function SignUpForm() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { setUser } = useAuth();
+
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -28,10 +35,17 @@ export function SignUpForm() {
 
   const onSubmit = async (data: SignUpFormValues) => {
     try {
-      // TODO: Implement sign up logic
-      console.log(data);
+      setIsLoading(true);
+      const response = await authService.signUp(data);
+
+      setUser(response.user);
+      toast.success("Account created successfully!");
+      // RouteGuard will handle the redirect to dashboard
     } catch (error) {
-      console.error(error);
+      console.error("Sign up error:", error);
+      toast.error(error instanceof Error ? error.message : "Sign up failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -121,11 +135,9 @@ export function SignUpForm() {
           <AnimatedButton
             type="submit"
             className="w-full h-12 text-base font-bold"
-            disabled={form.formState.isSubmitting}
+            disabled={isLoading}
           >
-            {form.formState.isSubmitting
-              ? "Creating account..."
-              : "Create account"}
+            {isLoading ? "Creating account..." : "Create account"}
           </AnimatedButton>
         </form>
       </Form>

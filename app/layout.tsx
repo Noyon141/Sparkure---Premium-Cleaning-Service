@@ -1,8 +1,10 @@
+import { AuthProvider } from "@/components/auth/auth-provider";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import ScrollToTop from "@/components/ScrollToTop";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
+import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
@@ -26,21 +28,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${dmSans.className} ${dmSans.variable}`}>
+      <body className={`${dmSans.className}`} suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
-          <SmoothScroll>
-            <div className="flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1 bg-background">{children}</main>
-              <Footer />
-              <ScrollToTop />
-            </div>
-          </SmoothScroll>
+          <AuthProvider>
+            <SmoothScroll>
+              <div className="flex min-h-screen flex-col" id="root">
+                <Header />
+                <main className="flex-1 bg-background">{children}</main>
+                <Footer />
+                <ScrollToTop />
+              </div>
+            </SmoothScroll>
+            <Toaster />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

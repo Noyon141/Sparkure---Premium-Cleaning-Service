@@ -1,8 +1,6 @@
+import { ContactForm } from "@/components/contact/contact-form";
 import { AnimatedWrapper } from "@/components/ui/animated-wrapper";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { PageTransitionWrapper } from "@/components/ui/page-transition-wrapper";
-import { Textarea } from "@/components/ui/textarea";
 import { contactData } from "@/data/contacts";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 
@@ -22,83 +20,7 @@ export default function ContactPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <AnimatedWrapper animation="slide">
-            <div className="bg-background p-8 rounded-2xl shadow-sm">
-              <h2 className="text-3xl font-semibold text-primary mb-6">
-                Send us a Message
-              </h2>
-              <form className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="firstName"
-                      className="text-sm font-medium text-neutral"
-                    >
-                      First Name
-                    </label>
-                    <Input id="firstName" placeholder="John" />
-                  </div>
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="lastName"
-                      className="text-sm font-medium text-neutral"
-                    >
-                      Last Name
-                    </label>
-                    <Input id="lastName" placeholder="Doe" />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label
-                    htmlFor="email"
-                    className="text-sm font-medium text-neutral"
-                  >
-                    Email
-                  </label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="john@example.com"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label
-                    htmlFor="phone"
-                    className="text-sm font-medium text-neutral"
-                  >
-                    Phone Number
-                  </label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="+1 (555) 000-0000"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label
-                    htmlFor="message"
-                    className="text-sm font-medium text-neutral"
-                  >
-                    Message
-                  </label>
-                  <Textarea
-                    id="message"
-                    placeholder="Tell us about your cleaning needs..."
-                    className="min-h-[150px]"
-                  />
-                </div>
-
-                <Button
-                  className="w-full cursor-pointer"
-                  variant="secondary"
-                  size="lg"
-                >
-                  Send Message
-                </Button>
-              </form>
-            </div>
+            <ContactForm />
           </AnimatedWrapper>
 
           <div className="space-y-8">

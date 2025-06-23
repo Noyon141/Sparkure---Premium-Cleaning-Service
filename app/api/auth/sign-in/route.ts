@@ -16,11 +16,29 @@ export async function POST(request: NextRequest) {
     // Find the user
     const user = await prisma.user.findUnique({
       where: { email: validatedData.email },
+      select: {
+        id: true,
+        email: true,
+        password: true,
+        fullName: true,
+        role: true,
+        isActive: true,
+        isEmailVerified: true,
+        createdAt: true,
+      },
     });
 
     if (!user) {
       return NextResponse.json(
         { error: "Invalid email or password" },
+        { status: 401 }
+      );
+    }
+
+    // Check if user is active
+    if (!user.isActive) {
+      return NextResponse.json(
+        { error: "Account is deactivated. Please contact support." },
         { status: 401 }
       );
     }
@@ -37,6 +55,15 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
+
+    // TODO: Re-enable email verification check when email verification is implemented
+    // For regular users, check email verification
+    // if (user.role === "USER" && !user.isEmailVerified) {
+    //   return NextResponse.json(
+    //     { error: "Please verify your email before signing in" },
+    //     { status: 401 }
+    //   );
+    // }
 
     // Generate JWT token
     const token = sign(
@@ -70,9 +97,10 @@ export async function POST(request: NextRequest) {
     // Set HTTP-only cookie
     response.cookies.set("auth-token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "production" ? true : false,
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60, // 7 days
+      path: "/", // Ensure cookie is available everywhere
     });
 
     return response;

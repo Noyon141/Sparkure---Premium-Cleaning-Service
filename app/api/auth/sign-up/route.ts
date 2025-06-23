@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
         fullName: validatedData.name,
         email: validatedData.email,
         password: hashedPassword,
+        isEmailVerified: true, // Auto-verify for now since email verification is not implemented
       },
       select: {
         id: true,

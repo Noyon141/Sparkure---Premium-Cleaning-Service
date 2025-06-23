@@ -1,15 +1,9 @@
+import { AuthUser } from "@/types";
 import { PrismaClient } from "@prisma/client";
 import { verify } from "jsonwebtoken";
 import { NextRequest } from "next/server";
 
 const prisma = new PrismaClient();
-
-export interface AuthUser {
-  id: string;
-  email: string;
-  fullName: string;
-  role: "USER" | "EMPLOYEE" | "ADMIN";
-}
 
 export async function getAuthUser(
   request: NextRequest

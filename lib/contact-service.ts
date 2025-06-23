@@ -1,19 +1,4 @@
-import { ContactFormValues } from "@/lib/validations/contact";
-
-export interface ContactSubmissionResponse {
-  message: string;
-  data: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    message: string;
-    createdAt: string;
-    updatedAt: string;
-    userId: string;
-  };
-}
+import { ContactFormValues, ContactSubmissionResponse } from "@/types";
 
 class ContactService {
   private baseUrl = "/api/contact";

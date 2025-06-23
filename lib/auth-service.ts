@@ -1,5 +1,4 @@
-import { User } from "@/lib/hooks/use-auth";
-import { SignInFormValues, SignUpFormValues } from "@/lib/validations/auth";
+import { SignInFormValues, SignUpFormValues, User } from "@/types";
 
 class AuthService {
   private baseUrl = "/api/auth";
@@ -12,7 +11,10 @@ class AuthService {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        ...data,
+        role: "USER", // Default role for new users
+      }),
     });
 
     if (!response.ok) {
@@ -63,6 +65,67 @@ class AuthService {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || "Failed to get user");
+    }
+
+    return response.json();
+  }
+
+  async updateProfile(
+    data: Partial<{
+      fullName: string;
+      phone: string;
+      avatar: string;
+      address: string;
+    }>
+  ): Promise<{ user: User }> {
+    const response = await fetch(`${this.baseUrl}/profile`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to update profile");
+    }
+
+    return response.json();
+  }
+
+  async changePassword(data: {
+    currentPassword: string;
+    newPassword: string;
+  }): Promise<{ message: string }> {
+    const response = await fetch(`${this.baseUrl}/change-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to change password");
+    }
+
+    return response.json();
+  }
+
+  async requestPasswordReset(email: string): Promise<{ message: string }> {
+    const response = await fetch(`${this.baseUrl}/reset-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to request password reset");
     }
 
     return response.json();

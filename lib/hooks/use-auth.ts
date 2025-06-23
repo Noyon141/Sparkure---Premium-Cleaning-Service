@@ -1,15 +1,8 @@
 "use client";
 
+import { User } from "@/types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-export interface User {
-  id: string;
-  fullName: string;
-  email: string;
-  role: "USER" | "EMPLOYEE" | "ADMIN";
-  createdAt: string;
-}
 
 interface AuthState {
   user: User | null;

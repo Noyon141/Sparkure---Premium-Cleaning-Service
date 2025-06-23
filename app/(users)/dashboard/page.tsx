@@ -7,7 +7,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
 
   return (
-    <RouteGuard requireAuth>
+    <RouteGuard requireAuth requireRole="USER">
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold text-primary mb-8">Dashboard</h1>

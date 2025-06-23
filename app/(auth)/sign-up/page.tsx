@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 
 export default function SignUpPage() {
   return (
-    <RouteGuard redirectTo="/dashboard">
+    <RouteGuard isAuthPage>
       <AnimatedWrapper>
         <div className="min-h-screen flex items-center justify-center bg-primary/10 relative overflow-hidden">
           {/* Background gradient effect */}

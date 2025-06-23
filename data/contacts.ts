@@ -1,47 +1,4 @@
-interface Company {
-  name: string;
-  tagline: string;
-}
-
-interface Address {
-  street: string;
-  city: string;
-  state: string;
-  zip: string;
-  country: string;
-}
-
-interface Contact {
-  email: string;
-  phone: string;
-  address: Address;
-}
-
-interface Social {
-  facebook: string;
-  twitter: string;
-  instagram: string;
-  linkedin: string;
-}
-
-interface BusinessHours {
-  weekdays: string;
-  saturday: string;
-  sunday: string;
-}
-
-interface ServiceArea {
-  name: string;
-  description?: string;
-}
-
-interface ContactData {
-  company: Company;
-  contact: Contact;
-  social: Social;
-  businessHours: BusinessHours;
-  serviceAreas: ServiceArea[];
-}
+import { ContactData } from "@/types";
 
 export const contactData: ContactData = {
   company: {

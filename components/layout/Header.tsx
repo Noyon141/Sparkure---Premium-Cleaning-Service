@@ -37,6 +37,18 @@ export function Header() {
     }
   };
 
+  const getDashboardLink = () => {
+    if (!user) return "/dashboard";
+    switch (user.role) {
+      case "ADMIN":
+        return "/admin";
+      case "EMPLOYEE":
+        return "/employee";
+      default:
+        return "/dashboard";
+    }
+  };
+
   return (
     <header className="border-b border-primary/10">
       <div className="container mx-auto px-4 py-4">
@@ -73,6 +85,16 @@ export function Header() {
                       </span>
                     </AnimatedWrapper>
                     <AnimatedWrapper animation="slide">
+                      <Link href={getDashboardLink()}>
+                        <AnimatedButton
+                          variant="outline"
+                          className="border-primary/20 hover:border-primary/40"
+                        >
+                          Dashboard
+                        </AnimatedButton>
+                      </Link>
+                    </AnimatedWrapper>
+                    <AnimatedWrapper animation="slide">
                       <AnimatedButton
                         variant="outline"
                         onClick={handleSignOut}
@@ -101,6 +123,30 @@ export function Header() {
                         </AnimatedButton>
                       </Link>
                     </AnimatedWrapper>
+                    <div className="flex items-center space-x-2">
+                      <AnimatedWrapper animation="slide">
+                        <Link href="/employee/sign-in">
+                          <AnimatedButton
+                            variant="outline"
+                            size="sm"
+                            className="border-blue-500/20 hover:border-blue-500/40 text-blue-500"
+                          >
+                            Employee
+                          </AnimatedButton>
+                        </Link>
+                      </AnimatedWrapper>
+                      <AnimatedWrapper animation="slide">
+                        <Link href="/admin/sign-in">
+                          <AnimatedButton
+                            variant="outline"
+                            size="sm"
+                            className="border-red-500/20 hover:border-red-500/40 text-red-500"
+                          >
+                            Admin
+                          </AnimatedButton>
+                        </Link>
+                      </AnimatedWrapper>
+                    </div>
                   </>
                 )}
               </>

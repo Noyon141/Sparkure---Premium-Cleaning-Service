@@ -4,20 +4,15 @@ import { authService } from "@/lib/auth-service";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { useEffect } from "react";
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
-export function AuthProvider({ children }: AuthProviderProps) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { setUser, setLoading } = useAuth();
 
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const response = await authService.getCurrentUser();
-        setUser(response.user);
-      } catch (error) {
-        console.error("Failed to get current user:", error);
+        const { user } = await authService.getCurrentUser();
+        setUser(user);
+      } catch {
         setUser(null);
       } finally {
         setLoading(false);

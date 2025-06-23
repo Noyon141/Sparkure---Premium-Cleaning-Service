@@ -12,7 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { authService } from "@/lib/auth-service";
 import { useAuth } from "@/lib/hooks/use-auth";
-import { signInSchema, type SignInFormValues } from "@/lib/validations/auth";
+import { signInSchema } from "@/lib/validations/auth";
+import { SignInFormValues } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useState } from "react";

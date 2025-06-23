@@ -13,19 +13,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { contactService } from "@/lib/contact-service";
 import { useAuth } from "@/lib/hooks/use-auth";
-import {
-  contactSchema,
-  type ContactFormValues,
-} from "@/lib/validations/contact";
+import { contactSchema } from "@/lib/validations/contact";
+import { ContactFormProps, ContactFormValues } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
-interface ContactFormProps {
-  initialData?: Partial<ContactFormValues>;
-}
 
 export function ContactForm({ initialData }: ContactFormProps) {
   const [isLoading, setIsLoading] = useState(false);

@@ -1,54 +1,363 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-generator client {
-  provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  USER
-  EMPLOYEE
-  ADMIN
+generator client {
+  provider = "prisma-client-js"
 }
 
 model User {
-  id        String   @id @default(uuid())
-  fullName  String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  role Role @default(USER)
+  id                       String    @id @default(uuid()) @db.Uuid
+  email                    String    @unique
+  password                 String
+  fullName                 String
+  phone                    String?   @unique
+  address                  String?
+  role                     UserRole  @default(USER)
+  avatar                   String?
+  isActive                 Boolean   @default(true)
+  isEmailVerified          Boolean   @default(false)
+  emailVerificationToken   String?
+  emailVerificationExpires DateTime?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
 
   // Relations
-  contactSubmissions ContactSubmission[]
+  cleaningsAsCustomer     Cleaning[]            @relation("CustomerCleanings")
+  cleaningsAsEmployee     Cleaning[]            @relation("EmployeeCleanings")
+  sentMessages            Message[]             @relation("SentMessages")
+  receivedMessages        Message[]             @relation("ReceivedMessages")
+  notifications           Notification[]
+  contactSubmissions      ContactSubmission[]
+  reviews                 Review[]
+  payments                Payment[]
+  serviceRequests         ServiceRequest[]
+  chatRooms               ChatRoomMember[]
+  phoneChanges            PhoneChange[]
+  adminInvitations        AdminInvitation[]     @relation("InvitedAdmins")
+  createdAdminInvitations AdminInvitation[]     @relation("CreatedByAdmin")
+  employeeApplications    EmployeeApplication[]
 
   @@map("users")
 }
 
+model PhoneChange {
+  id        String   @id @default(uuid()) @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @db.Uuid
+  newPhone  String
+  token     String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("phone_changes")
+}
+
 model ContactSubmission {
-  id        String   @id @default(uuid())
+  id        String        @id @default(uuid()) @db.Uuid
   firstName String
   lastName  String
   email     String
   phone     String
   message   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    ContactStatus @default(PENDING)
+  user      User?         @relation(fields: [userId], references: [id])
+  userId    String?       @db.Uuid
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
   @@map("contact_submissions")
+}
+
+model Cleaning {
+  id          String         @id @default(uuid()) @db.Uuid
+  customer    User           @relation("CustomerCleanings", fields: [customerId], references: [id])
+  customerId  String         @db.Uuid
+  employee    User?          @relation("EmployeeCleanings", fields: [employeeId], references: [id])
+  employeeId  String?        @db.Uuid
+  serviceType ServiceType
+  date        DateTime
+  address     String
+  status      CleaningStatus @default(SCHEDULED)
+  priority    Priority       @default(NORMAL)
+  note        String?
+  price       Decimal?       @db.Decimal(10, 2)
+  duration    Int? // in minutes
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  // Relations
+  reviews  Review[]
+  payments Payment[]
+
+  @@map("cleanings")
+}
+
+model ServiceRequest {
+  id            String        @id @default(uuid()) @db.Uuid
+  customer      User          @relation(fields: [customerId], references: [id])
+  customerId    String        @db.Uuid
+  serviceType   ServiceType
+  description   String
+  address       String
+  preferredDate DateTime?
+  status        RequestStatus @default(PENDING)
+  priority      Priority      @default(NORMAL)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@map("service_requests")
+}
+
+model Message {
+  id          String      @id @default(uuid()) @db.Uuid
+  sender      User        @relation("SentMessages", fields: [senderId], references: [id])
+  senderId    String      @db.Uuid
+  receiver    User        @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiverId  String      @db.Uuid
+  content     String
+  isRead      Boolean     @default(false)
+  messageType MessageType @default(TEXT)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("messages")
+}
+
+model ChatRoom {
+  id            String       @id @default(uuid()) @db.Uuid
+  name          String?
+  type          ChatRoomType @default(DIRECT)
+  lastMessage   String?
+  lastMessageAt DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Relations
+  members  ChatRoomMember[]
+  messages ChatMessage[]
+
+  @@map("chat_rooms")
+}
+
+model ChatRoomMember {
+  id         String    @id @default(uuid()) @db.Uuid
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String    @db.Uuid
+  chatRoom   ChatRoom  @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  chatRoomId String    @db.Uuid
+  joinedAt   DateTime  @default(now())
+  lastReadAt DateTime?
+
+  @@unique([userId, chatRoomId])
+  @@map("chat_room_members")
+}
+
+model ChatMessage {
+  id          String          @id @default(uuid()) @db.Uuid
+  chatRoom    ChatRoom        @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  chatRoomId  String          @db.Uuid
+  senderId    String          @db.Uuid
+  content     String
+  messageType ChatMessageType @default(TEXT)
+  isRead      Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@map("chat_messages")
+}
+
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String           @db.Uuid
+  title     String
+  message   String
+  type      NotificationType
+  isRead    Boolean          @default(false)
+  data      Json? // Additional data for the notification
+  createdAt DateTime         @default(now())
+
+  @@map("notifications")
+}
+
+model Review {
+  id         String   @id @default(uuid()) @db.Uuid
+  customer   User     @relation(fields: [customerId], references: [id])
+  customerId String   @db.Uuid
+  cleaning   Cleaning @relation(fields: [cleaningId], references: [id])
+  cleaningId String   @db.Uuid
+  rating     Int // 1-5 stars
+  comment    String?
+  isPublic   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([customerId, cleaningId])
+  @@map("reviews")
+}
+
+model Payment {
+  id                    String        @id @default(uuid()) @db.Uuid
+  customer              User          @relation(fields: [customerId], references: [id])
+  customerId            String        @db.Uuid
+  cleaning              Cleaning?     @relation(fields: [cleaningId], references: [id])
+  cleaningId            String?       @db.Uuid
+  amount                Decimal       @db.Decimal(10, 2)
+  currency              String        @default("USD")
+  status                PaymentStatus @default(PENDING)
+  method                PaymentMethod
+  stripePaymentIntentId String?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  @@map("payments")
+}
+
+model AdminInvitation {
+  id            String    @id @default(uuid()) @db.Uuid
+  email         String
+  fullName      String
+  token         String    @unique
+  isUsed        Boolean   @default(false)
+  expiresAt     DateTime
+  invitedBy     User      @relation("CreatedByAdmin", fields: [invitedById], references: [id])
+  invitedById   String    @db.Uuid
+  invitedUser   User?     @relation("InvitedAdmins", fields: [invitedUserId], references: [id])
+  invitedUserId String?   @db.Uuid
+  createdAt     DateTime  @default(now())
+  usedAt        DateTime?
+
+  @@map("admin_invitations")
+}
+
+model EmployeeApplication {
+  id           String                    @id @default(uuid()) @db.Uuid
+  user         User                      @relation(fields: [userId], references: [id])
+  userId       String                    @db.Uuid
+  phone        String
+  address      String
+  experience   String
+  skills       String[]
+  availability String
+  status       EmployeeApplicationStatus @default(PENDING)
+  reviewedBy   String?                   @db.Uuid
+  reviewedAt   DateTime?
+  notes        String?
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+
+  @@map("employee_applications")
+}
+
+// Enums
+enum UserRole {
+  USER
+  EMPLOYEE
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum ContactStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum ServiceType {
+  HOME_CLEANING
+  OFFICE_CLEANING
+  MOVE_IN_OUT
+  DEEP_CLEANING
+  REGULAR_CLEANING
+  POST_CONSTRUCTION
+  CARPET_CLEANING
+  WINDOW_CLEANING
+  UPHOLSTERY_CLEANING
+}
+
+enum CleaningStatus {
+  SCHEDULED
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  SYSTEM
+}
+
+enum ChatRoomType {
+  DIRECT
+  GROUP
+  SUPPORT
+}
+
+enum ChatMessageType {
+  TEXT
+  IMAGE
+  FILE
+  SYSTEM
+}
+
+enum NotificationType {
+  CLEANING_SCHEDULED
+  CLEANING_STARTED
+  CLEANING_COMPLETED
+  PAYMENT_RECEIVED
+  PAYMENT_FAILED
+  MESSAGE_RECEIVED
+  REVIEW_RECEIVED
+  SYSTEM_UPDATE
+  PROMOTIONAL
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  BANK_TRANSFER
+  CASH
+  DIGITAL_WALLET
+}
+
+enum EmployeeApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

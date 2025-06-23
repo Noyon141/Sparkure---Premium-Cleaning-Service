@@ -107,6 +107,11 @@ A modern, real-time cleaning service management platform built with Next.js, Pri
    SMTP_PORT="587"
    SMTP_USER="your-smtp-username"
    SMTP_PASS="your-smtp-password"
+
+   # Main Admin (for scripts/create-main-admin.js)
+   MAIN_ADMIN_FULL_NAME=""
+   MAIN_ADMIN_EMAIL=""
+   MAIN_ADMIN_PASSWORD=""
    ```
 
 4. **Set up the database**
@@ -380,3 +385,15 @@ For support and questions:
 - [ ] Customer loyalty program
 
 #
+
+## Create Main Admin User
+
+To create a main admin user, run:
+
+```bash
+node scripts/create-main-admin.js
+```
+
+- The script will use `MAIN_ADMIN_FULL_NAME` and `MAIN_ADMIN_EMAIL` and `MAIN_ADMIN_PASSWORD` from your environment variables.
+- If the admin already exists, the script will notify you.
+- Change the email and password in your `.env.local` to create a different admin if needed.

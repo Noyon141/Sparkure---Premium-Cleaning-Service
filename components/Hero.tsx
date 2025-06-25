@@ -4,8 +4,15 @@ import { AnimatedButton } from "@/components/ui/animated-button";
 import { motion } from "framer-motion";
 import { Clock, Star, ThumbsUp } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const Hero = () => {
+  const router = useRouter();
+
+  //Handle the booking
+  const booking = () => {
+    router.push("/booking");
+  };
   return (
     <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 w-full min-h-[calc(100vh-4rem)]">
       {/* Left Content */}
@@ -25,7 +32,11 @@ const Hero = () => {
         </p>
 
         <div className="flex items-center justify-center sm:justify-start gap-4 pt-4">
-          <AnimatedButton size="lg" className="w-full sm:w-auto font-bold">
+          <AnimatedButton
+            size="lg"
+            className="w-full sm:w-auto font-bold"
+            onClick={booking}
+          >
             Book Now
           </AnimatedButton>
           <AnimatedButton

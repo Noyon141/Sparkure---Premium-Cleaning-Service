@@ -388,3 +388,38 @@ export interface SmoothScrollProps {
     infinite?: boolean;
   };
 }
+
+// =================================================================
+// Booking Types
+// =================================================================
+
+export type ServiceCategory = "OFFICE" | "HOME" | "MOVING_AND_PAINTING";
+
+export interface ServiceOption {
+  id: string;
+  category: ServiceCategory;
+  name: string;
+  description: string;
+  image: string;
+  basePrice: number;
+  features: string[];
+}
+
+export interface BookingFormValues {
+  serviceCategory: ServiceCategory;
+  date: string;
+  time: string;
+  address: string;
+  notes?: string;
+  frequency?: "ONE_TIME" | "WEEKLY" | "BI_WEEKLY" | "MONTHLY";
+  squareFootage?: number;
+  rooms?: number;
+  bathrooms?: number;
+  extras?: string[];
+}
+
+export interface BookingStepProps {
+  onNext: (data: Partial<BookingFormValues>) => void;
+  onBack?: () => void;
+  defaultValues?: Partial<BookingFormValues>;
+}

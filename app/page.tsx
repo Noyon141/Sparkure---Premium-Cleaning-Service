@@ -1,3 +1,4 @@
+import Faq from "@/components/FAQ";
 import Hero from "@/components/Hero";
 import Process from "@/components/Process";
 import Services from "@/components/Services";
@@ -12,6 +13,7 @@ export default function Home() {
         <Process />
         <Services />
         <Testimonials />
+        <Faq />
       </main>
     </PageTransitionWrapper>
   );

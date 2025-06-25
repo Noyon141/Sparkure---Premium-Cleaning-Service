@@ -4,6 +4,7 @@ import { AnimatedButton } from "@/components/ui/animated-button";
 import { PageTransitionWrapper } from "@/components/ui/page-transition-wrapper";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const services = [
   {
@@ -11,18 +12,21 @@ const services = [
     description:
       "Thorough cleaning for every corner of your home, using eco-friendly products.",
     image: "/images/services/home.jpg",
+    category: "HOME",
   },
   {
     name: "Office Cleaning",
     description:
       "Keep your workspace spotless and productive with our flexible office cleaning plans.",
     image: "/images/services/office.jpg",
+    category: "OFFICE",
   },
   {
     name: "Move-In/Move-Out Cleaning",
     description:
       "Perfect for tenants and landlords. We make moving stress-free and sparkling clean.",
     image: "/images/services/moving.jpeg",
+    category: "MOVING_AND_PAINTING",
   },
 ];
 
@@ -51,6 +55,10 @@ const itemVariants = {
 };
 
 export default function ServicesPage() {
+  const router = useRouter();
+  const handleBookNow = (serviceCategory: string) => {
+    router.push(`/booking/details?service=${serviceCategory}`);
+  };
   return (
     <PageTransitionWrapper>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
@@ -104,6 +112,7 @@ export default function ServicesPage() {
                     size="lg"
                     variant="outline"
                     className="w-full font-bold"
+                    onClick={() => handleBookNow(service.category)}
                   >
                     Book Now
                   </AnimatedButton>

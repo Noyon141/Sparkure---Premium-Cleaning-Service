@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { ClipboardCheck, Clock, Sparkles, Truck } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const Process = () => {
   const steps = [
@@ -38,7 +39,11 @@ const Process = () => {
         "Our team performs a final inspection to ensure everything meets our high standards of cleanliness.",
     },
   ];
+  const router = useRouter();
 
+  const bookNow = () => {
+    router.push("/booking");
+  };
   return (
     <div className="container mx-auto py-16 px-4">
       <motion.div
@@ -87,7 +92,7 @@ const Process = () => {
         </div>
 
         <div className="text-center">
-          <AnimatedButton size="lg" className="font-bold">
+          <AnimatedButton size="lg" className="font-bold" onClick={bookNow}>
             Book Your Cleaning Now
           </AnimatedButton>
         </div>

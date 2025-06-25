@@ -13,9 +13,10 @@ import { Input } from "@/components/ui/input";
 import { authService } from "@/lib/auth-service";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { signUpSchema } from "@/lib/validations/auth";
-import { SignUpFormValues } from "@/types";
+import { SignInFormValues, SignUpFormValues } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -23,6 +24,7 @@ import { toast } from "sonner";
 export function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { setUser } = useAuth();
+  const router = useRouter();
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
@@ -37,11 +39,18 @@ export function SignUpForm() {
   const onSubmit = async (data: SignUpFormValues) => {
     try {
       setIsLoading(true);
-      const response = await authService.signUp(data);
+      // Sign up the user
+      await authService.signUp(data);
 
-      setUser(response.user);
       toast.success("Account created successfully!");
-      // RouteGuard will handle the redirect to dashboard
+      // Auto sign-in after successful sign-up
+      const signInData: SignInFormValues = {
+        email: data.email,
+        password: data.password,
+      };
+      const signInResponse = await authService.signIn(signInData);
+      setUser(signInResponse.user);
+      router.push("/dashboard");
     } catch (error) {
       console.error("Sign up error:", error);
       toast.error(error instanceof Error ? error.message : "Sign up failed");

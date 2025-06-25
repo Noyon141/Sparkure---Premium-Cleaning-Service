@@ -13,27 +13,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { PageTransitionWrapper } from "@/components/ui/page-transition-wrapper";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  BookingDetailsFormValues,
+  bookingDetailsSchema,
+} from "@/lib/validations/booking-validation";
 import { ServiceCategory } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
-
-const bookingDetailsSchema = z.object({
-  serviceCategory: z.enum(["OFFICE", "HOME", "MOVING_AND_PAINTING"]),
-  date: z.string().min(1, "Please select a date"),
-  time: z.string().min(1, "Please select a time"),
-  address: z.string().min(1, "Address is required"),
-  notes: z.string().optional(),
-  frequency: z.enum(["ONE_TIME", "WEEKLY", "BI_WEEKLY", "MONTHLY"]),
-  squareFootage: z.coerce.number().positive("Square footage must be positive"),
-  rooms: z.coerce.number().positive("Number of rooms must be positive"),
-  bathrooms: z.coerce.number().positive("Number of bathrooms must be positive"),
-});
-
-type BookingDetailsFormValues = z.infer<typeof bookingDetailsSchema>;
 
 export default function BookingDetailsClient() {
   const router = useRouter();
@@ -187,7 +176,12 @@ export default function BookingDetailsClient() {
                     <FormItem>
                       <FormLabel>Square Footage</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="0" {...field} />
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          min={500}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -201,7 +195,12 @@ export default function BookingDetailsClient() {
                     <FormItem>
                       <FormLabel>Rooms</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="0" {...field} />
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          min={1}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -215,7 +214,12 @@ export default function BookingDetailsClient() {
                     <FormItem>
                       <FormLabel>Bathrooms</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="0" {...field} />
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          min={0}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

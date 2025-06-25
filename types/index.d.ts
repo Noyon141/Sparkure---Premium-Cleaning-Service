@@ -252,6 +252,15 @@ export interface FAQItem {
   answer: string;
 }
 
+export interface Testimonial {
+  name: string;
+  role: string;
+  company?: string;
+  image: string;
+  rating: number;
+  review: string;
+}
+
 export interface FAQData {
   faqs: FAQItem[];
 }

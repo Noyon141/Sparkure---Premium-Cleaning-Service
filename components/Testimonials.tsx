@@ -7,38 +7,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { testimonials } from "@/data/testimonials";
 import { AnimatePresence, motion } from "framer-motion";
 import { Star } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-
-const testimonials = [
-  {
-    name: "Sarah Johnson",
-    role: "Office Manager",
-    company: "Tech Solutions Inc.",
-    image: "/testimonials/sarah.avif",
-    rating: 5,
-    review:
-      "The office cleaning service is exceptional. They maintain our workspace impeccably, and their attention to detail is impressive. Highly recommended!",
-  },
-  {
-    name: "Michael Chen",
-    role: "Homeowner",
-    image: "/testimonials/michael.avif",
-    rating: 5,
-    review:
-      "Their home cleaning service transformed our house. Both interior and exterior cleaning was thorough and professional. The team was courteous and efficient.",
-  },
-  {
-    name: "Emma Rodriguez",
-    role: "Apartment Resident",
-    image: "/testimonials/emma.avif",
-    rating: 5,
-    review:
-      "Moving cleaning service was a lifesaver! They handled both cleaning and painting, making our transition smooth and stress-free. The quality of work was outstanding.",
-  },
-];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -63,10 +43,26 @@ const itemVariants = {
 
 const Testimonials = () => {
   const [mounted, setMounted] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [carouselApi, setCarouselApi] = useState<any>(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Listen to carousel select event
+  useEffect(() => {
+    if (!carouselApi) return;
+    const onSelect = () => {
+      setSelectedIndex(carouselApi.selectedScrollSnap());
+    };
+    carouselApi.on("select", onSelect);
+    onSelect();
+    return () => {
+      carouselApi.off("select", onSelect);
+    };
+  }, [carouselApi]);
 
   return (
     <div className="container mx-auto py-16 px-4">
@@ -88,50 +84,125 @@ const Testimonials = () => {
               </p>
             </motion.div>
 
-            <motion.div
-              variants={containerVariants}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
-              {testimonials.map((testimonial) => (
-                <motion.div key={testimonial.name} variants={itemVariants}>
-                  <Card className="h-full hover:shadow-lg transition-all duration-300">
-                    <CardHeader className="flex flex-row items-center gap-4">
-                      <div className="relative w-16 h-16 rounded-full overflow-hidden">
-                        <Image
-                          src={testimonial.image}
-                          alt={testimonial.name}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
-                      </div>
-                      <div>
-                        <CardTitle className="text-xl">
-                          {testimonial.name}
-                        </CardTitle>
-                        <CardDescription>
-                          {testimonial.role}
-                          {testimonial.company && ` • ${testimonial.company}`}
-                        </CardDescription>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex gap-1 mb-4">
-                        {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className="w-5 h-5 fill-primary text-primary"
+            {/* Testimonials Section */}
+            {testimonials.length > 3 ? (
+              <div className="relative overflow-hidden">
+                <Carousel
+                  className="w-full"
+                  opts={{ loop: true }}
+                  setApi={setCarouselApi}
+                >
+                  <CarouselContent>
+                    {testimonials.map((testimonial) => (
+                      <CarouselItem
+                        key={testimonial.name}
+                        className="basis-1/1 lg:basis-1/3"
+                      >
+                        <Card className="h-full hover:shadow-lg transition-all duration-300">
+                          <CardHeader className="flex flex-row items-center gap-4">
+                            <div className="relative w-16 h-16 rounded-full overflow-hidden">
+                              <Image
+                                src={testimonial.image}
+                                alt={testimonial.name}
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                              />
+                            </div>
+                            <div>
+                              <CardTitle className="text-xl">
+                                {testimonial.name}
+                              </CardTitle>
+                              <CardDescription>
+                                {testimonial.role}
+                                {testimonial.company &&
+                                  ` • ${testimonial.company}`}
+                              </CardDescription>
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex gap-1 mb-4">
+                              {[...Array(testimonial.rating)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className="w-5 h-5 fill-primary text-primary"
+                                />
+                              ))}
+                            </div>
+                            <p className="text-neutral-200/80 italic">
+                              &ldquo;{testimonial.review}&rdquo;
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </Carousel>
+                {/* Pagination Dots */}
+                <div className="flex justify-center mt-6 gap-2">
+                  {testimonials.map((_, idx) => (
+                    <button
+                      key={idx}
+                      className={`w-2 h-2 rounded-full transition-colors duration-200 border-none focus:outline-none ${
+                        selectedIndex === idx
+                          ? "bg-primary scale-125"
+                          : "bg-neutral-500/40"
+                      }`}
+                      onClick={() => carouselApi && carouselApi.scrollTo(idx)}
+                      aria-label={`Go to slide ${idx + 1}`}
+                      type="button"
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <motion.div
+                variants={containerVariants}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                {testimonials.map((testimonial) => (
+                  <motion.div key={testimonial.name} variants={itemVariants}>
+                    <Card className="h-full hover:shadow-lg transition-all duration-300">
+                      <CardHeader className="flex flex-row items-center gap-4">
+                        <div className="relative w-16 h-16 rounded-full overflow-hidden">
+                          <Image
+                            src={testimonial.image}
+                            alt={testimonial.name}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                           />
-                        ))}
-                      </div>
-                      <p className="text-neutral-200/80 italic">
-                        &ldquo;{testimonial.review}&rdquo;
-                      </p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </motion.div>
+                        </div>
+                        <div>
+                          <CardTitle className="text-xl">
+                            {testimonial.name}
+                          </CardTitle>
+                          <CardDescription>
+                            {testimonial.role}
+                            {testimonial.company && ` • ${testimonial.company}`}
+                          </CardDescription>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex gap-1 mb-4">
+                          {[...Array(testimonial.rating)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className="w-5 h-5 fill-primary text-primary"
+                            />
+                          ))}
+                        </div>
+                        <p className="text-neutral-200/80 italic">
+                          &ldquo;{testimonial.review}&rdquo;
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
 
             <motion.div variants={itemVariants} className="text-center mt-12">
               <p className="text-lg text-neutral-200/80">

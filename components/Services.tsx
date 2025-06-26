@@ -8,35 +8,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ourServices } from "@/data/our-services";
 import { motion } from "framer-motion";
-import { Building2, Home, Truck } from "lucide-react";
 import Image from "next/image";
-
-const services = [
-  {
-    title: "Office Cleaning",
-    description:
-      "Professional cleaning services for your workspace. We handle everything from daily maintenance to deep cleaning of office spaces, meeting rooms, and common areas.",
-    icon: Building2,
-    image: "/images/services/office.jpg",
-  },
-  {
-    title: "Home Cleaning",
-    description:
-      "Comprehensive cleaning for your entire home, both interior and exterior. From deep cleaning of rooms to maintaining outdoor spaces, we ensure your home stays spotless.",
-    icon: Home,
-    image: "/images/services/home.jpg",
-  },
-  {
-    title: "Moving & Painting",
-    description:
-      "Complete cleaning service for moving out/in, including optional painting services. We'll help you leave your old space spotless and prepare your new space for a fresh start.",
-    icon: Truck,
-    image: "/images/services/moving.jpeg",
-  },
-];
+import { useRouter } from "next/navigation";
 
 const Services = () => {
+  const router = useRouter();
+  const handleBookNow = (serviceCategory: string) => {
+    router.push(`/booking/details?service=${serviceCategory}`);
+  };
   return (
     <div className="container mx-auto py-16 px-4">
       <motion.div
@@ -55,7 +36,7 @@ const Services = () => {
       </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {services.map((service, index) => (
+        {ourServices.map((service, index) => (
           <motion.div
             key={service.title}
             initial={{ opacity: 0, y: 20 }}
@@ -85,6 +66,7 @@ const Services = () => {
                   variant="outline"
                   size="lg"
                   className="w-full font-bold"
+                  onClick={() => handleBookNow(service.category.toLowerCase())}
                 >
                   Book Now
                 </AnimatedButton>

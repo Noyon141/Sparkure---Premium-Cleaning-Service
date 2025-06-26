@@ -112,7 +112,9 @@ export default function ServicesPage() {
                     size="lg"
                     variant="outline"
                     className="w-full font-bold"
-                    onClick={() => handleBookNow(service.category)}
+                    onClick={() =>
+                      handleBookNow(service.category.toLowerCase())
+                    }
                   >
                     Book Now
                   </AnimatedButton>

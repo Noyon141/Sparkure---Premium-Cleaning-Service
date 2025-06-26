@@ -13,6 +13,10 @@ const Hero = () => {
   const booking = () => {
     router.push("/booking");
   };
+
+  const learnMore = () => {
+    router.push("/about");
+  };
   return (
     <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 w-full min-h-[calc(100vh-4rem)]">
       {/* Left Content */}
@@ -43,6 +47,7 @@ const Hero = () => {
             variant="outline"
             size="lg"
             className="w-full sm:w-auto"
+            onClick={learnMore}
           >
             Learn More
           </AnimatedButton>

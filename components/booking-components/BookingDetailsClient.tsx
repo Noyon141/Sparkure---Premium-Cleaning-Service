@@ -23,6 +23,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useBooking } from "../../lib/hooks/use-booking";
 import { DatePickerField, TimePickerField } from "../ui/date-picker";
 
 export default function BookingDetailsClient() {
@@ -30,6 +31,7 @@ export default function BookingDetailsClient() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const [ready, setReady] = useState(false);
+  const { booking, setBooking, clearBooking } = useBooking();
 
   // Wait for hydration
   useEffect(() => {
@@ -50,7 +52,7 @@ export default function BookingDetailsClient() {
 
   const form = useForm<BookingDetailsFormValues>({
     resolver: zodResolver(bookingDetailsSchema),
-    defaultValues: {
+    defaultValues: booking || {
       serviceCategory: serviceType || "HOME",
       date: undefined,
       time: "",
@@ -71,13 +73,28 @@ export default function BookingDetailsClient() {
     } else {
       form.setValue("serviceCategory", serviceType);
     }
+    // Prefill form with booking state if available
+    if (booking) {
+      Object.entries(booking).forEach(([key, value]) => {
+        form.setValue(key as keyof BookingDetailsFormValues, value);
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serviceType, router, ready]);
+  }, [serviceType, router, ready, booking]);
+
+  // Reset booking state if not on details or confirmation page
+  useEffect(() => {
+    if (
+      !pathname.startsWith("/booking/details") &&
+      !pathname.startsWith("/booking/confirmation")
+    ) {
+      clearBooking();
+    }
+  }, [pathname, clearBooking]);
 
   const onSubmit = async (data: BookingDetailsFormValues) => {
     try {
-      // TODO: Submit booking data to API
-      console.log("Booking data:", data);
+      setBooking(data);
       toast.success("Booking details saved! Redirecting to confirmation...");
       router.push("/booking/confirmation");
     } catch (error) {
@@ -132,6 +149,7 @@ export default function BookingDetailsClient() {
                         field={field}
                         label="Date"
                         placeholder="Pick your date"
+                        minDate={new Date()}
                       />
                       <FormMessage />
                     </FormItem>

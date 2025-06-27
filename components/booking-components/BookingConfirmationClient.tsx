@@ -4,10 +4,21 @@ import { AnimatedButton } from "@/components/ui/animated-button";
 import { Card } from "@/components/ui/card";
 import { PageTransitionWrapper } from "@/components/ui/page-transition-wrapper";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { toast } from "sonner";
+import { useBooking } from "../../lib/hooks/use-booking";
 
 export default function BookingConfirmationClient() {
   const router = useRouter();
+  const { booking } = useBooking();
+
+  useEffect(() => {
+    if (!booking) {
+      router.replace("/booking/details?service=home");
+    }
+  }, [booking, router]);
+
+  if (!booking) return null;
 
   const handleConfirm = async () => {
     try {
@@ -33,31 +44,39 @@ export default function BookingConfirmationClient() {
             </p>
           </div>
 
-          {/* TODO: Display booking summary from context/state */}
+          {/* Dynamic booking summary */}
           <div className="space-y-4 border rounded-lg p-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <h3 className="font-medium text-primary">Service</h3>
-                <p className="text-neutral-200/80">Home Cleaning</p>
+                <p className="text-neutral-200/80">
+                  {booking.serviceCategory.replace("_", " ")}
+                </p>
               </div>
               <div>
                 <h3 className="font-medium text-primary">Date & Time</h3>
                 <p className="text-neutral-200/80">
-                  March 15, 2024 at 10:00 AM
+                  {booking.date
+                    ? new Date(booking.date).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })
+                    : "-"}
+                  {booking.time ? ` at ${booking.time}` : ""}
                 </p>
               </div>
               <div>
                 <h3 className="font-medium text-primary">Address</h3>
-                <p className="text-neutral-200/80">
-                  123 Example St, City, State
-                </p>
+                <p className="text-neutral-200/80">{booking.address}</p>
               </div>
               <div>
                 <h3 className="font-medium text-primary">Frequency</h3>
-                <p className="text-neutral-200/80">One Time</p>
+                <p className="text-neutral-200/80">
+                  {booking.frequency?.replace("_", " ")}
+                </p>
               </div>
             </div>
-
             <div className="border-t pt-4 mt-4">
               <h3 className="font-medium text-primary mb-2">
                 Property Details
@@ -65,43 +84,39 @@ export default function BookingConfirmationClient() {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <p className="text-sm text-neutral-200/60">Square Footage</p>
-                  <p className="text-neutral-200/80">2000 sq ft</p>
+                  <p className="text-neutral-200/80">
+                    {booking.squareFootage || "-"} sq ft
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-neutral-200/60">Rooms</p>
-                  <p className="text-neutral-200/80">4</p>
+                  <p className="text-neutral-200/80">{booking.rooms || "-"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-neutral-200/60">Bathrooms</p>
-                  <p className="text-neutral-200/80">2</p>
+                  <p className="text-neutral-200/80">
+                    {booking.bathrooms || "-"}
+                  </p>
                 </div>
               </div>
             </div>
-
-            <div className="border-t pt-4 mt-4">
-              <h3 className="font-medium text-primary mb-2">Price Breakdown</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-neutral-200/80">Base Price</span>
-                  <span className="text-neutral-200/80">$120.00</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-200/80">Extra Services</span>
-                  <span className="text-neutral-200/80">$30.00</span>
-                </div>
-                <div className="flex justify-between font-medium text-primary pt-2 border-t">
-                  <span>Total</span>
-                  <span>$150.00</span>
-                </div>
+            {booking.notes && (
+              <div className="border-t pt-4 mt-4">
+                <h3 className="font-medium text-primary mb-2">Notes</h3>
+                <p className="text-neutral-200/80">{booking.notes}</p>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="flex justify-between pt-4">
             <AnimatedButton
               type="button"
               variant="outline"
-              onClick={() => router.back()}
+              onClick={() =>
+                router.push(
+                  `/booking/details?service=${booking.serviceCategory.toLowerCase()}`
+                )
+              }
             >
               Back
             </AnimatedButton>

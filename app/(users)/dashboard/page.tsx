@@ -2,6 +2,8 @@
 
 import { RouteGuard } from "@/components/auth/route-guard";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { Settings } from "lucide-react";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -56,14 +58,18 @@ export default function DashboardPage() {
               <p className="text-neutral-200/80">View your past services</p>
             </div>
 
-            <div className="bg-card p-6 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold text-primary mb-2">
-                Settings
-              </h3>
+            <Link
+              href="/dashboard/Settings"
+              className="bg-card p-6 rounded-lg shadow-sm transition hover:shadow-md flex flex-col cursor-pointer group focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <div className="flex items-center mb-2">
+                <Settings className="w-6 h-6 text-primary group-hover:rotate-12 transition-transform mr-2" />
+                <h3 className="text-xl font-semibold text-primary">Settings</h3>
+              </div>
               <p className="text-neutral-200/80">
                 Update your profile and preferences
               </p>
-            </div>
+            </Link>
           </div>
         </div>
       </div>

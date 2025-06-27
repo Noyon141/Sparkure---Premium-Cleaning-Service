@@ -34,6 +34,8 @@ export async function GET(request: NextRequest) {
         fullName: true,
         email: true,
         role: true,
+        phone: true,
+        address: true,
         createdAt: true,
         updatedAt: true,
       },

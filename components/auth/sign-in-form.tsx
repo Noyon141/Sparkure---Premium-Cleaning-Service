@@ -16,13 +16,15 @@ import { signInSchema } from "@/lib/validations/auth";
 import { SignInFormValues } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-export function SignInForm() {
+export function SignInForm({ returnTo }: { returnTo?: string }) {
   const [isLoading, setIsLoading] = useState(false);
   const { setUser } = useAuth();
+  const router = useRouter();
 
   const form = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
@@ -39,7 +41,9 @@ export function SignInForm() {
 
       setUser(response.user);
       toast.success("Sign in successful!");
-      // RouteGuard will handle the redirect to dashboard
+      if (returnTo) {
+        router.push(returnTo);
+      }
     } catch (error) {
       console.error("Sign in error:", error);
       toast.error(error instanceof Error ? error.message : "Sign in failed");

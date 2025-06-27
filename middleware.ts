@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // Only protect dashboard, admin, and employee pages
-const protectedRoutes = ["/dashboard", "/admin", "/employee"];
+const protectedRoutes = ["/dashboard", "/admin", "/employee", "/booking"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -27,7 +27,15 @@ export function middleware(request: NextRequest) {
     !isAuthPage &&
     protectedRoutes.some((route) => pathname.startsWith(route))
   ) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    // Add returnTo param to redirect back after sign-in
+    const returnTo = encodeURIComponent(
+      pathname + (request.nextUrl.search || "")
+    );
+    const signInUrl = new URL(
+      `/sign-in?returnTo=${returnTo}&reason=booking`,
+      request.url
+    );
+    return NextResponse.redirect(signInUrl);
   }
 
   // Otherwise, allow

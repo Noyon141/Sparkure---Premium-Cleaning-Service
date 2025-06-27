@@ -23,6 +23,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { DatePickerField, TimePickerField } from "../ui/date-picker";
 
 export default function BookingDetailsClient() {
   const router = useRouter();
@@ -51,7 +52,7 @@ export default function BookingDetailsClient() {
     resolver: zodResolver(bookingDetailsSchema),
     defaultValues: {
       serviceCategory: serviceType || "HOME",
-      date: "",
+      date: undefined,
       time: "",
       address: "",
       notes: "",
@@ -127,10 +128,11 @@ export default function BookingDetailsClient() {
                   name="date"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Date</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
+                      <DatePickerField
+                        field={field}
+                        label="Date"
+                        placeholder="Pick your date"
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -141,11 +143,11 @@ export default function BookingDetailsClient() {
                   name="time"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Time</FormLabel>
-                      <FormControl>
-                        <Input type="time" {...field} />
-                      </FormControl>
-                      <FormMessage />
+                      <TimePickerField
+                        label="Time"
+                        field={field}
+                        placeholder="Select Time"
+                      />
                     </FormItem>
                   )}
                 />

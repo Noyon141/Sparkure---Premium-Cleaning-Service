@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const bookingDetailsSchema = z.object({
   serviceCategory: z.enum(["OFFICE", "HOME", "MOVING_AND_PAINTING"]),
-  date: z.string().min(1, "Please select a date"),
+  date: z.date({ required_error: "Please select a date" }),
   time: z.string().min(1, "Please select a time"),
   address: z.string().min(1, "Address is required"),
   notes: z.string().optional(),

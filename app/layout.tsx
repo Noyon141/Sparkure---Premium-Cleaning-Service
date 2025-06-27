@@ -44,7 +44,7 @@ export default function RootLayout({
                 <ScrollToTop />
               </div>
             </SmoothScroll>
-            <Toaster />
+            <Toaster position="bottom-center" />
           </AuthProvider>
         </ThemeProvider>
       </body>

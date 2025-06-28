@@ -13,9 +13,12 @@ import { Cleaning } from "@/types";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
+type TabType = "active" | "completed";
+
 export default function UserHistoryList() {
   const [cleanings, setCleanings] = useState<Cleaning[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<TabType>("active");
   const [filterDateFrom, setFilterDateFrom] = useState("");
   const [filterDateTo, setFilterDateTo] = useState("");
   const [filterServiceType, setFilterServiceType] = useState("");
@@ -28,7 +31,8 @@ export default function UserHistoryList() {
       if (filterDateTo) params.append("dateTo", filterDateTo);
       if (filterServiceType) params.append("serviceType", filterServiceType);
 
-      const response = await fetch(`/api/history?${params.toString()}`);
+      // Fetch all cleanings, not just completed ones
+      const response = await fetch(`/api/cleanings?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
         setCleanings(data.cleanings || []);
@@ -47,15 +51,14 @@ export default function UserHistoryList() {
     fetchCleanings();
   }, [fetchCleanings]);
 
-  // Refetch when filters change
-  useEffect(() => {
-    fetchCleanings();
-  }, [fetchCleanings]);
-
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "COMPLETED":
         return "bg-green-500/10 text-green-500";
+      case "IN_PROGRESS":
+        return "bg-blue-500/10 text-blue-500";
+      case "ASSIGNED":
+        return "bg-purple-500/10 text-purple-500";
       case "CANCELLED":
         return "bg-red-500/10 text-red-500";
       default:
@@ -73,7 +76,14 @@ export default function UserHistoryList() {
     });
   };
 
-  const filteredCleanings = cleanings; // No client-side filtering needed since backend handles it
+  // Filter cleanings based on active tab
+  const filteredCleanings = cleanings.filter((cleaning) => {
+    if (activeTab === "active") {
+      return ["SCHEDULED", "ASSIGNED", "IN_PROGRESS"].includes(cleaning.status);
+    } else {
+      return cleaning.status === "COMPLETED";
+    }
+  });
 
   if (loading) {
     return (
@@ -85,6 +95,30 @@ export default function UserHistoryList() {
 
   return (
     <div className="space-y-6">
+      {/* Tabs */}
+      <div className="flex space-x-1 bg-background/50 rounded-lg p-1">
+        <button
+          onClick={() => setActiveTab("active")}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            activeTab === "active"
+              ? "bg-primary text-primary-foreground"
+              : "text-neutral-200/80 hover:text-neutral"
+          }`}
+        >
+          Active Bookings
+        </button>
+        <button
+          onClick={() => setActiveTab("completed")}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            activeTab === "completed"
+              ? "bg-primary text-primary-foreground"
+              : "text-neutral-200/80 hover:text-neutral"
+          }`}
+        >
+          Completed Services
+        </button>
+      </div>
+
       {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-background/50 rounded-lg">
         <div>
@@ -135,7 +169,11 @@ export default function UserHistoryList() {
       <div className="space-y-4">
         {filteredCleanings.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-neutral-200/80">No completed services found</p>
+            <p className="text-neutral-200/80">
+              {activeTab === "active"
+                ? "No active bookings found"
+                : "No completed services found"}
+            </p>
           </div>
         ) : (
           <Table>

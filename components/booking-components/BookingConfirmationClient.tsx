@@ -10,11 +10,11 @@ import { useBooking } from "../../lib/hooks/use-booking";
 
 export default function BookingConfirmationClient() {
   const router = useRouter();
-  const { booking } = useBooking();
+  const { booking, clearBooking } = useBooking();
 
   useEffect(() => {
     if (!booking) {
-      router.replace("/booking/details?service=home");
+      router.replace("/booking");
     }
   }, [booking, router]);
 
@@ -22,12 +22,45 @@ export default function BookingConfirmationClient() {
 
   const handleConfirm = async () => {
     try {
-      // TODO: Submit final confirmation to API
+      // Map booking data to cleaning API format
+      const cleaningData = {
+        serviceType:
+          booking.serviceCategory === "HOME"
+            ? "HOME_CLEANING"
+            : booking.serviceCategory === "OFFICE"
+            ? "OFFICE_CLEANING"
+            : "MOVE_IN_OUT",
+        date: booking.date.toISOString(),
+        address: booking.address,
+        note: booking.notes || "",
+        price: null, // Will be calculated by backend
+        duration: null, // Will be calculated by backend
+        priority: "NORMAL",
+      };
+
+      const response = await fetch("/api/cleanings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(cleaningData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create booking");
+      }
+
+      // Clear booking data from storage
+      clearBooking();
+
       toast.success("Booking confirmed! Redirecting to dashboard...");
       router.push("/dashboard/bookings");
     } catch (error) {
-      console.log(error, "Failed to confirm booking");
-      toast.error("Failed to confirm booking");
+      console.error("Failed to confirm booking:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to confirm booking"
+      );
     }
   };
 

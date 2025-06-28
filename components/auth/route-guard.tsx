@@ -32,7 +32,7 @@ export function RouteGuard({
 
     if (requireAuth) {
       if (!isAuthenticated) {
-        router.push("/sign-in");
+        router.push("/");
         return;
       }
 

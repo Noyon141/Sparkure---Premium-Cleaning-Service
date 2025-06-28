@@ -12,7 +12,7 @@ import { authService } from "@/lib/auth-service";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -54,6 +54,7 @@ export function Header() {
   const { user, isAuthenticated, logout, isLoading } = useAuth();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     setOpen(false);
@@ -64,7 +65,8 @@ export function Header() {
       await authService.signOut();
       logout();
       toast.success("Signed out successfully");
-      // RouteGuard will handle the redirect to home page
+      // Force redirect to home page
+      router.push("/");
     } catch (error) {
       console.error("Sign out error:", error);
       toast.error("Failed to sign out");

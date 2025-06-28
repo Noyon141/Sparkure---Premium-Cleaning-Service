@@ -137,6 +137,35 @@ export const PATCH = requireAuth(async (request: NextRequest, user) => {
       });
     }
 
+    // Validate cancellation logic
+    if (body.status === "CANCELLED") {
+      // Only allow cancellation of SCHEDULED bookings
+      if (existingCleaning.status !== "SCHEDULED") {
+        return new Response(
+          JSON.stringify({
+            error: "Only scheduled bookings can be cancelled",
+          }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      // Only customers can cancel their own bookings
+      if (user.role !== "USER") {
+        return new Response(
+          JSON.stringify({
+            error: "Only customers can cancel bookings",
+          }),
+          {
+            status: 403,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+    }
+
     // Prepare update data
     const updateData: Record<string, unknown> = {};
 

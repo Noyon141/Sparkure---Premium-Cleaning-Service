@@ -2,7 +2,7 @@
 
 import { RouteGuard } from "@/components/auth/route-guard";
 import { useAuth } from "@/lib/hooks/use-auth";
-import { Settings } from "lucide-react";
+import { History, Settings } from "lucide-react";
 import Link from "next/link";
 
 export default function DashboardPage() {
@@ -51,12 +51,16 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <div className="bg-card p-6 rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold text-primary mb-2">
-                History
-              </h3>
+            <Link
+              href="/dashboard/history"
+              className="bg-card p-6 rounded-lg shadow-sm transition hover:shadow-md flex flex-col cursor-pointer group focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <div className="flex items-center mb-2">
+                <History className="w-6 h-6 text-primary group-hover:rotate-12 transition-transform mr-2" />
+                <h3 className="text-xl font-semibold text-primary">History</h3>
+              </div>
               <p className="text-neutral-200/80">View your past services</p>
-            </div>
+            </Link>
 
             <Link
               href="/dashboard/Settings"
